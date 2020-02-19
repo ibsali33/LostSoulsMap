@@ -1,0 +1,129 @@
+---
+title: "MolecularMimicry"
+author: "Ibraheem Ali"
+date: "1/29/2020"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(exifr)
+library(leaflet)
+library(sf)
+library(leafpop)
+library(mapview)
+```
+
+# About
+
+## Divisions
+
+### About Molecular Mimicry
+
+Molecular Mimicry is a biological concept that describes when something in the body, usually a protein on a virus or a cell, mimics something that it is not. I originally trained as a virologist, so in this context the proteins on the surface of a virus could look like that of its host. Effectively hiding itself from the immune system. This is a useful strategy for a virus that wants to discreetly infect a host, but it is a bad strategy if that virus is trying to create its own identity. </br>
+
+I have always struggled with pinpointing my identity. I am a child of a Pakistani and Colombian couple born and raised in California. I am a scientist, an artist, a librarian, a hippie, a techie, a public speaker, a performer, a dancer, a musician, a Muslim. I am so many things sometimes I feel like I will never fully be any of those things. To me, Molecular Mimicry represents the shapeshifting of my identity that enables me to fit within the communities which surround me. In a sense, it allows me to be a part of an unending array of things, but it also perpetuates the struggle in identifying my identity.</br>
+
+I convey this through my art which manifests in various forms that you can explore in this web space. 
+
+### The Person Behind the Project
+
+![Ibraheem Ali, PhD](WorkingFolder/IMG_20191212_153608.jpg)
+
+# Digital Prints
+
+## Separator {.tabset .tabset-fade}
+
+### The Kitten Revolution
+
+#### The Time Has Come for me to tell you the story of the revolutionary kitten
+
+```{r, out.width = "600px"}
+knitr::include_graphics("Markers/TheTimeHasCome.png")
+```
+
+#### He was a skiddish fellow, unusually mellow, and lived in a world with powoerful oppressors
+
+```{r, out.width = "600px"}
+knitr::include_graphics("Markers/ThoughtfulCat.png")
+```
+
+#### One strange day, he ate a weird root, and all of the colors began to sing.
+
+```{r, out.width = "600px"}
+knitr::include_graphics("Markers/Shroomz.png")
+```
+
+### Synesthesia Collection
+
+### Anxiety Collection
+
+# Lost Souls
+
+## Divisions
+
+### Lost Soul Selection
+
+``` {r SoulMap0}
+souls <- read.csv(file = "LostSouls/souls.csv", header=TRUE)
+Images<-as.character(souls$name)
+Images0<-normalizePath(Images)
+dat <- read_exif(Images0, tags = c("FileName", "GPSLatitude", "GPSLongitude"))
+soulMap<-data.frame(souls$icon, souls$name, dat$GPSLatitude, dat$GPSLongitude)
+
+SoulIcons <- iconList(
+  soul0 = makeIcon("LostSouls/Soul0.png", iconRetinaUrl = NULL, 40,40),
+  soul1 = makeIcon("LostSouls/Soul1.png", iconRetinaUrl = NULL, 40, 40),
+  rose = makeIcon("LostSouls/Rose.png", iconRetinaUrl = NULL, 40, 40),
+  soul2 = makeIcon("LostSouls/soul2.png", iconRetinaUrl = NULL, 40, 40),
+  soul3 = makeIcon("LostSouls/soul3.png", iconRetinaUrl = NULL, 40, 40)
+)
+
+m<-leaflet(soulMap) %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addMarkers(icon=~SoulIcons[souls.icon],
+             lat = soulMap$dat.GPSLatitude,
+             lng = soulMap$dat.GPSLongitude,
+             clusterOptions = markerClusterOptions()
+)
+
+m
+```
+
+### Lost Soul Map
+
+``` {r, SoulMap1}
+# This imports the complete data frame.
+souls <- read.csv(file = "LostSouls/souls.csv", header=TRUE)
+
+#This creates a pts_df data frame for the latitutde and longitude columns from the complete data frame
+pts_df<-data.frame(souls$lng, souls$lat)
+
+#This condenses the pts_df data frame into a sf object (idk really what that means)
+pts_sf<-st_as_sf(pts_df, coords = c("souls.lng", "souls.lat"), crs=4326)
+
+Images<-as.character(souls$name)
+Images0<-normalizePath(Images)
+
+#This defines the icons that are going to be used in the map
+SoulIcons <- iconList(
+  soul0 = makeIcon("LostSouls/Soul0.png", iconRetinaUrl = NULL, 40,40),
+  soul1 = makeIcon("LostSouls/Soul1.png", iconRetinaUrl = NULL, 40, 40),
+  rose = makeIcon("LostSouls/Rose.png", iconRetinaUrl = NULL, 40, 40)
+)
+
+#This plots the map
+m<-leaflet(souls) %>% 
+ addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircleMarkers(
+    clusterOptions = markerClusterOptions()) %>%
+  addPopups(m, lat=souls$lat, lng=souls$lng)
+
+m
+
+```
+
